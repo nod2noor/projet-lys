@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dossier Lys</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+SC:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg: #121014;
+  --bg-soft: #1a171d;
+  --bg-card: #17151a;
+  --ink: #ECE6D6;
+  --ink-dim: #8b8577;
+  --ink-faint: #55524c;
+  --gold: #B8934A;
+  --gold-bright: #D9B463;
+  --red: #8a2f39;
+  --locked: #3a3730;
+  --line: #2c2933;
+  --serif: 'Cormorant Garamond', serif;
+  --caps: 'Cormorant SC', serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(184,147,74,0.06), transparent 60%),
+    radial-gradient(ellipse at 80% 110%, rgba(184,147,74,0.04), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.screen{
+  display:none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 8vh 6vw 6vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.8s ease;
+}
+.screen.active{ display:flex; }
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.eyebrow{
+  font-family: var(--caps);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+
+h1{
+  font-size: clamp(2.1rem, 6vw, 3.4rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align:center;
+  margin-bottom: 1rem;
+}
+
+.lede{
+  font-style: italic;
+  color: var(--ink-dim);
+  text-align:center;
+  max-width: 34ch;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  margin-bottom: 2.4rem;
+}
+
+.mono{
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+}
+
+/* ---------- BOOT SCREEN ---------- */
+#boot .mono-line{
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink-dim);
+  min-height: 1.6em;
+  text-align:center;
+}
+#boot .mono-line.lit{ color: var(--gold-bright); }
+#boot-tap{
+  margin-top: 3rem;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  font-family: var(--caps);
+  letter-spacing: 0.3em;
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 1rem 2rem;
+  border: 1px solid var(--line);
+}
+#boot-tap.show{ opacity: 1; }
+
+/* ---------- CODE GATE ---------- */
+.code-form{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 360px;
+}
+input[type="text"]{
+  width:100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--gold-bright);
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  letter-spacing: 0.3em;
+  text-align:center;
+  text-transform: uppercase;
+  padding: 0.8rem 0;
+  outline: none;
+  transition: border-color 0.3s;
+}
+input[type="text"]:focus{ border-color: var(--gold); }
+input[type="text"]::placeholder{ color: var(--ink-faint); letter-spacing: 0.2em; }
+
+button{
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold-bright);
+  font-family: var(--caps);
+  letter-spacing: 0.25em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  padding: 0.9rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+button:hover{ background: var(--gold); color: var(--bg); }
+button:active{ transform: scale(0.98); }
+
+.feedback{
+  min-height: 1.4em;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-align:center;
+}
+.feedback.err{ color: var(--red); animation: shake 0.4s; }
+.feedback.ok{ color: var(--gold-bright); }
+@keyframes shake{
+  0%,100%{ transform: translateX(0); }
+  25%{ transform: translateX(-6px); }
+  75%{ transform: translateX(6px); }
+}
+
+/* ---------- HUB ---------- */
+#hub{ justify-content: flex-start; padding-top: 6vh; }
+.hub-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom: 2.5rem;
+}
+.hub-meta{
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  text-align:center;
+  line-height: 1.9;
+  margin-top: 0.8rem;
+}
+.hub-meta b{ color: var(--gold-bright); font-weight:500; }
+
+.lily-wrap{ margin: 0.5rem 0 1rem; }
+.petal{
+  fill: transparent;
+  stroke: var(--ink-faint);
+  stroke-width: 1.4;
+  transition: all 0.8s ease;
+}
+.petal.lit{
+  fill: var(--gold);
+  stroke: var(--gold-bright);
+  filter: drop-shadow(0 0 6px rgba(184,147,74,0.5));
+}
+.lily-center{ fill: var(--ink-faint); transition: fill 0.8s ease; }
+.lily-center.lit{ fill: var(--gold-bright); }
+
+.dossier-list{
+  width: 100%;
+  max-width: 480px;
+  display:flex;
+  flex-direction:column;
+  gap: 0.6rem;
+}
+.dossier-row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+}
+.dossier-row:hover{ border-color: var(--ink-faint); }
+.dossier-row.locked{ cursor: not-allowed; opacity: 0.45; }
+.dossier-row.done{ border-color: var(--gold); }
+.dr-left{ display:flex; flex-direction:column; gap: 0.15rem; }
+.dr-num{ font-family: var(--mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.15em; }
+.dr-title{ font-size: 1.15rem; }
+.dr-status{ font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--ink-faint); text-transform: uppercase; }
+.dr-status.done{ color: var(--gold-bright); }
+.dr-status.active{ color: var(--ink); }
+
+/* ---------- DOSSIER DETAIL ---------- */
+#detail{ justify-content: flex-start; padding-top: 8vh; }
+.detail-theme{
+  font-style: italic;
+  color: var(--ink-dim);
+  text-align:center;
+  margin-bottom: 2rem;
+}
+.puzzle-box{
+  width:100%;
+  max-width: 480px;
+  border: 1px dashed var(--line);
+  padding: 1.6rem;
+  margin-bottom: 2rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  line-height: 1.7;
+}
+.puzzle-box .tag{
+  color: var(--gold);
+  font-family: var(--caps);
+  letter-spacing: 0.2em;
+  font-size: 0.65rem;
+  display:block;
+  margin-bottom: 0.6rem;
+}
+.back-link{
+  margin-top: 2.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+}
+.back-link:hover{ color: var(--ink-dim); }
+
+/* ---------- REWARD ---------- */
+.reward-box{
+  border: 1px solid var(--gold);
+  padding: 2.2rem 2rem;
+  max-width: 420px;
+  text-align:center;
+  margin-bottom: 2rem;
+}
+.reward-box .mono{ display:block; margin-bottom: 1rem; }
+.reward-title{ font-style: italic; font-size: 1.3rem; color: var(--gold-bright); line-height: 1.4; }
+
+/* ---------- FINAL ---------- */
+#final{
+  background: radial-gradient(ellipse at center, rgba(184,147,74,0.08), var(--bg) 70%);
+}
+#final h1{ color: var(--gold-bright); }
+
+.progress-text{ font-family: var(--mono); font-size: 0.75rem; color: var(--ink-faint); margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<!-- ============ BOOT ============ -->
+<section class="screen active" id="boot">
+  <div id="boot-lines"></div>
+  <div class="mono" id="boot-tap">toucher pour continuer</div>
+</section>
+
+<!-- ============ CODE GATE (Prologue) ============ -->
+<section class="screen" id="gate">
+  <div class="eyebrow">Accès restreint</div>
+  <h1>Dossier Lys</h1>
+  <p class="lede">Ce qui ouvre une porte n'est pas toujours une clé.</p>
+  <form class="code-form" id="gate-form">
+    <input type="text" id="gate-input" placeholder="ENTRER LE CODE" autocomplete="off" autocapitalize="characters">
+    <button type="submit">Valider</button>
+    <div class="feedback" id="gate-feedback"></div>
+  </form>
+</section>
+
+<!-- ============ HUB ============ -->
+<section class="screen" id="hub">
+  <div class="hub-header">
+    <div class="eyebrow">Dossier Lys</div>
+    <div class="lily-wrap">
+      <svg width="120" height="120" viewBox="0 0 120 120" id="lily-svg"></svg>
+    </div>
+    <div class="hub-meta">
+      Utilisatrice : <b>DOHA</b><br>
+      Statut : <b id="hub-status">ENQUÊTE ACTIVE</b><br>
+      <span class="progress-text" id="hub-progress">Dossiers terminés : 0/6</span>
+    </div>
+  </div>
+  <div class="dossier-list" id="dossier-list"></div>
+</section>
+
+<!-- ============ DOSSIER DETAIL ============ -->
+<section class="screen" id="detail">
+  <div class="eyebrow" id="detail-num">Dossier 01</div>
+  <h1 id="detail-title">Le regard</h1>
+  <p class="detail-theme" id="detail-theme">L'observation.</p>
+
+  <div class="puzzle-box">
+    <span class="tag">Contenu à remplacer</span>
+    <span id="detail-mission">— placeholder mission —</span>
+  </div>
+
+  <form class="code-form" id="detail-form">
+    <input type="text" id="detail-input" placeholder="ENTRER LE CODE" autocomplete="off" autocapitalize="characters">
+    <button type="submit">Valider</button>
+    <div class="feedback" id="detail-feedback"></div>
+  </form>
+
+  <div class="back-link" onclick="goHub()">← retour au dossier</div>
+</section>
+
+<!-- ============ REWARD ============ -->
+<section class="screen" id="reward">
+  <div class="eyebrow">Récompense récupérée</div>
+  <div class="reward-box">
+    <span class="mono" id="reward-status">ANALYSE TERMINÉE.</span>
+    <div class="reward-title" id="reward-letter">"— titre de la lettre —"</div>
+  </div>
+  <p class="lede" style="margin-bottom:2rem">Adresse-toi à Nour pour récupérer la lettre correspondante.</p>
+  <button onclick="goHub()">Continuer</button>
+</section>
+
+<!-- ============ FINAL ============ -->
+<section class="screen" id="final">
+  <div class="eyebrow">Dossier final</div>
+  <h1>La dernière page</h1>
+  <p class="lede">Toutes les informations ont été retrouvées. Mais une dernière question reste : quelle est la chose la plus importante dans une histoire ?</p>
+  <div class="puzzle-box">
+    <span class="tag">À remplacer</span>
+    <span>— emplacement pour la vidéo finale (lien à intégrer) —</span>
+  </div>
+  <button onclick="alert('Enquête terminée. Récompense finale disponible. Adresse-toi à Nour.')">Enquête terminée</button>
+</section>
+
+<script>
+/* =========================================================
+   CONFIG — Nour, c'est ici que tu remplaces le contenu placeholder
+   par le vrai texte, les vraies missions et les vrais codes.
+   ========================================================= */
+
+const PROLOGUE_CODE = "LYS"; // code trouvé sur la fleur séchée
+
+const dossiers = [
+  {
+    num: "01",
+    title: "Le regard",
+    theme: "L'observation.",
+    mission: "Trouve ce qui est caché devant toi. Une image sera affichée ici — le code se trouve dans un détail visuel ou dans les métadonnées du fichier.",
+    code: "OBSERVE",
+    rewardLetter: "Lettre n°1 — « À ouvrir lorsque tu auras besoin de te rappeler pourquoi tu as choisi cette personne. »"
+  },
+  {
+    num: "02",
+    title: "Les coordonnées du passé",
+    theme: "Les lieux qui racontent une histoire.",
+    mission: "Des coordonnées GPS mèneront à un lieu important. Une série de chiffres convertie en A1Z26 donnera le mot de passe.",
+    code: "ALBUM",
+    rewardLetter: "Lettre n°2 — « À ouvrir lorsque vous traversez une période difficile. »"
+  },
+  {
+    num: "03",
+    title: "Le commencement",
+    theme: "La naissance de leur histoire d'amour.",
+    mission: "Une série d'indices (hiver, bibliothèque, campus...) mène à un lieu précis. Une question sur une date validera le dossier.",
+    code: "COMMENCEMENT",
+    rewardLetter: "Lettre n°3 — « À ouvrir lorsque tu te sentiras seule. »"
+  },
+  {
+    num: "04",
+    title: "Les fondations",
+    theme: "Les valeurs, la foi, les fondements d'une vie et d'un mariage.",
+    mission: "Une phrase affichée à l'écran contient des lettres volontairement en majuscule. Assemblées, elles forment un mot.",
+    code: "SABR",
+    rewardLetter: "Lettre n°4 — « À ouvrir lorsque tu doutes de toi. »"
+  },
+  {
+    num: "05",
+    title: "Les détails",
+    theme: "L'identité de Doha.",
+    mission: "Trois mini-énigmes autour de ses goûts personnels (café, tarte au citron, Dostoïevski) donnent chacune un fragment du code final.",
+    code: "REGARDE",
+    rewardLetter: "Lettre n°5 — « À ouvrir lorsque tu oublieras qui tu es. »"
+  },
+  {
+    num: "06",
+    title: "Le monde réel",
+    theme: "Sortir du virtuel.",
+    mission: "Un indice mène à un lieu physique (Basic Fit). Un casier fermé par un cadenas contient le dernier code avant le dossier final.",
+    code: "BASICFIT",
+    rewardLetter: null // pas de lettre classique, mène directement au dossier final
+  }
+];
+
+/* ========================================================= */
+
+const STORAGE_KEY = "dossier-lys-progress";
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { gateUnlocked:false, completed:[] };
+}
+function saveProgress(p){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){}
+}
+let progress = loadProgress();
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ---------- BOOT sequence ---------- */
+const bootLines = ["Initialisation…", "Analyse de l'identité…", "Bienvenue Doha."];
+function playBoot(){
+  const container = document.getElementById('boot-lines');
+  let i = 0;
+  function next(){
+    if(i >= bootLines.length){
+      document.getElementById('boot-tap').classList.add('show');
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'mono-line';
+    line.textContent = bootLines[i];
+    container.appendChild(line);
+    setTimeout(() => line.classList.add('lit'), 50);
+    i++;
+    setTimeout(next, 1100);
+  }
+  next();
+}
+document.getElementById('boot-tap').addEventListener('click', () => {
+  if(progress.gateUnlocked){ goHub(); } else { showScreen('gate'); }
+});
+playBoot();
+
+/* ---------- GATE (prologue code) ---------- */
+document.getElementById('gate-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const val = document.getElementById('gate-input').value.trim().toUpperCase();
+  const fb = document.getElementById('gate-feedback');
+  if(val === PROLOGUE_CODE){
+    fb.textContent = "CODE ACCEPTÉ. Bienvenue dans le Dossier Lys.";
+    fb.className = "feedback ok";
+    progress.gateUnlocked = true;
+    saveProgress(progress);
+    setTimeout(goHub, 1200);
+  } else {
+    fb.textContent = "ACCÈS REFUSÉ.";
+    fb.className = "feedback err";
+  }
+});
+
+/* ---------- LILY SVG ---------- */
+function buildLily(){
+  const svg = document.getElementById('lily-svg');
+  svg.innerHTML = '';
+  const petalPath = "M60,62 C48,44 48,14 60,2 C72,14 72,44 60,62 Z";
+  for(let i=0;i<6;i++){
+    const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d", petalPath);
+    p.setAttribute("class", "petal");
+    p.setAttribute("id", "petal-"+i);
+    p.setAttribute("transform", `rotate(${i*60} 60 60)`);
+    svg.appendChild(p);
+  }
+  const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx","60"); c.setAttribute("cy","60"); c.setAttribute("r","7");
+  c.setAttribute("class","lily-center"); c.setAttribute("id","lily-center");
+  svg.appendChild(c);
+}
+function updateLily(){
+  for(let i=0;i<6;i++){
+    const petal = document.getElementById('petal-'+i);
+    if(progress.completed.includes(i)) petal.classList.add('lit');
+    else petal.classList.remove('lit');
+  }
+  document.getElementById('lily-center').classList.toggle('lit', progress.completed.length === 6);
+}
+
+/* ---------- HUB ---------- */
+function goHub(){
+  renderHub();
+  showScreen('hub');
+}
+function renderHub(){
+  buildLily();
+  updateLily();
+  document.getElementById('hub-progress').textContent = `Dossiers terminés : ${progress.completed.length}/6`;
+  document.getElementById('hub-status').textContent = progress.completed.length === 6 ? "ENQUÊTE TERMINÉE" : "ENQUÊTE ACTIVE";
+
+  const list = document.getElementById('dossier-list');
+  list.innerHTML = '';
+
+  dossiers.forEach((d, idx) => {
+    const isDone = progress.completed.includes(idx);
+    const isUnlocked = idx === 0 || progress.completed.includes(idx-1);
+    const row = document.createElement('div');
+    row.className = 'dossier-row' + (isDone ? ' done' : '') + (!isUnlocked ? ' locked' : '');
+    row.innerHTML = `
+      <div class="dr-left">
+        <span class="dr-num">DOSSIER ${d.num}</span>
+        <span class="dr-title">${isUnlocked ? d.title : '???'}</span>
+      </div>
+      <span class="dr-status ${isDone ? 'done' : (isUnlocked ? 'active' : '')}">
+        ${isDone ? 'Terminé' : (isUnlocked ? 'Disponible' : 'Verrouillé')}
+      </span>
+    `;
+    if(isUnlocked && !isDone){
+      row.addEventListener('click', () => openDossier(idx));
+    } else if(isUnlocked && isDone){
+      row.addEventListener('click', () => openDossier(idx));
+    } else {
+      row.addEventListener('click', () => {
+        row.style.borderColor = 'var(--red)';
+        setTimeout(()=> row.style.borderColor = '', 400);
+      });
+    }
+    list.appendChild(row);
+  });
+
+  // Dossier final row, unlocked only when all 6 done
+  const finalUnlocked = progress.completed.length === 6;
+  const finalRow = document.createElement('div');
+  finalRow.className = 'dossier-row' + (!finalUnlocked ? ' locked' : '');
+  finalRow.innerHTML = `
+    <div class="dr-left">
+      <span class="dr-num">DOSSIER FINAL</span>
+      <span class="dr-title">${finalUnlocked ? 'La dernière page' : '???'}</span>
+    </div>
+    <span class="dr-status ${finalUnlocked ? 'active' : ''}">${finalUnlocked ? 'Disponible' : 'Verrouillé'}</span>
+  `;
+  if(finalUnlocked){
+    finalRow.addEventListener('click', () => showScreen('final'));
+  }
+  list.appendChild(finalRow);
+}
+
+/* ---------- DOSSIER DETAIL ---------- */
+let currentIdx = null;
+function openDossier(idx){
+  currentIdx = idx;
+  const d = dossiers[idx];
+  document.getElementById('detail-num').textContent = `Dossier ${d.num}`;
+  document.getElementById('detail-title').textContent = d.title;
+  document.getElementById('detail-theme').textContent = d.theme;
+  document.getElementById('detail-mission').textContent = d.mission;
+  document.getElementById('detail-input').value = '';
+  document.getElementById('detail-feedback').textContent = '';
+  document.getElementById('detail-feedback').className = 'feedback';
+
+  const isDone = progress.completed.includes(idx);
+  const form = document.getElementById('detail-form');
+  if(isDone){
+    document.getElementById('detail-feedback').textContent = "Dossier déjà résolu.";
+    document.getElementById('detail-feedback').className = 'feedback ok';
+    form.querySelector('input').disabled = true;
+    form.querySelector('button').disabled = true;
+  } else {
+    form.querySelector('input').disabled = false;
+    form.querySelector('button').disabled = false;
+  }
+  showScreen('detail');
+}
+
+document.getElementById('detail-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(currentIdx === null) return;
+  const d = dossiers[currentIdx];
+  const val = document.getElementById('detail-input').value.trim().toUpperCase();
+  const fb = document.getElementById('detail-feedback');
+
+  if(val === d.code){
+    fb.textContent = "ANALYSE TERMINÉE. Dossier validé.";
+    fb.className = "feedback ok";
+    if(!progress.completed.includes(currentIdx)){
+      progress.completed.push(currentIdx);
+      saveProgress(progress);
+    }
+    setTimeout(() => {
+      if(d.rewardLetter){
+        document.getElementById('reward-letter').textContent = d.rewardLetter;
+        showScreen('reward');
+      } else {
+        goHub();
+      }
+    }, 1300);
+  } else {
+    fb.textContent = "ACCÈS REFUSÉ.";
+    fb.className = "feedback err";
+  }
+});
+
+/* init */
+renderHub();
+</script>
+</body>
+</html>
